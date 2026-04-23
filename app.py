@@ -1,40 +1,25 @@
 from flask import Flask, render_template, request
-from ultralytics import YOLO
 import os
 
-app = Flask(**name**)
-
-# Load model
-
-model = YOLO("yolov8n.pt")
+app = Flask(__name__)
 
 UPLOAD_FOLDER = "static/uploads"
-OUTPUT_IMAGE = "static/output.jpg"
-
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-
-# Ensure upload folder exists
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-if request.method == "POST":
-file = request.files["file"]
+    image_path = None
 
-```
-    if file:
-        filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
-        file.save(filepath)
+    if request.method == "POST":
+        file = request.files["file"]
+        if file:
+            filepath = os.path.join(app.config["UPLOAD_FOLDER"], file.filename)
+            file.save(filepath)
+            image_path = "uploads/" + file.filename
 
-        # Run detection
-        results = model(filepath)
-        results[0].save(filename=OUTPUT_IMAGE)
+    return render_template("index.html", output=image_path)
 
-        return render_template("index.html", output="output.jpg")
-
-return render_template("index.html", output=None)
-```
-
-if **name** == "**main**":
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
